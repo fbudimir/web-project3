@@ -267,12 +267,23 @@ function updateGame() {
 						ball.dy = Math.abs(ball.dy);
 					} else if (collisionFromTop) {
 						ball.dy = -Math.abs(ball.dy);
-					}
-					if (collisionFromLeft) {
+					} else if (collisionFromLeft) {
 						ball.dx = -Math.abs(ball.dx);
 					} else if (collisionFromRight) {
 						ball.dx = Math.abs(ball.dx);
 					}
+
+					// if (collisionFromBottom) {
+					// 	ball.dy = Math.abs(ball.dy);
+					// } else if (collisionFromTop) {
+					// 	ball.dy = -Math.abs(ball.dy);
+					// }
+					// if (collisionFromLeft) {
+					// 	ball.dx = -Math.abs(ball.dx);
+					// } else if (collisionFromRight) {
+					// 	ball.dx = Math.abs(ball.dx);
+					// }
+					// CUDNO PONASANJE PONEKAD
 
 					// oznaci ciglu kao mrtvu i povecaj score
 					b.status = 0;
