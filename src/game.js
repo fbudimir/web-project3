@@ -31,10 +31,10 @@ let ball = {
 
 // varijable za cigle
 const brickRowNum = 8;
-const brickColumnNum = 16;
-const brickWidth = 45;
-const brickHeight = 15;
-const brickPadding = 5;
+const brickColumnNum = 14;
+const brickWidth = 53;
+const brickHeight = 20;
+const brickPadding = 4;
 const brickOffsetTop = 100;
 const brickOffsetLeft = 3;
 let bricks = []; // bricks array
@@ -130,15 +130,15 @@ function drawBricks() {
 
 				// gornji svjetliji dio
 				ctx.fillStyle = lighterColor;
-				ctx.fillRect(brickX, brickY, brickWidth, 3);
+				ctx.fillRect(brickX, brickY, brickWidth, 4);
 
 				// donji tamniji dio
 				ctx.fillStyle = darkerColor;
-				ctx.fillRect(brickX, brickY + brickHeight - 3, brickWidth, 3);
+				ctx.fillRect(brickX, brickY + brickHeight - 4, brickWidth, 4);
 
 				// glavni dio
 				ctx.fillStyle = mainColor;
-				ctx.fillRect(brickX, brickY + 3, brickWidth, brickHeight - 6);
+				ctx.fillRect(brickX, brickY + 4, brickWidth, brickHeight - 8);
 			}
 		}
 	}
