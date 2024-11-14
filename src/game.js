@@ -4,11 +4,12 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800; // fiksirana sirina
-canvas.height = window.innerHeight; // cijela duzina ekrana
+// cijela duzina i sirina ekrana
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 // varijable palice
-const paddleWidth = 100;
+const paddleWidth = 150;
 const paddleHeight = 20;
 let paddle = {
 	x: canvas.width / 2 - paddleWidth / 2,
@@ -17,7 +18,7 @@ let paddle = {
 	height: paddleHeight,
 	color: "red",
 	speed: 10, // brzina pomicaja palice
-	dx: 0, // promjena u x osi, na pocetku 0
+	dx: 0, // diferencijal promjene u x osi, na pocetku 0, za ovoliko se palica pomice svakim novim frame-om
 };
 // varijable loptice
 let ball = {
@@ -25,25 +26,34 @@ let ball = {
 	y: canvas.height - 40,
 	radius: 6,
 	dx: Math.random() < 0.5 ? -6 : 6, // nasumican pocetni smjer
-	dy: -6,
+	dy: -6, // vertikalni diferencijal pomaka, za ovoliko se loptica pomice svakim novim frame-om
 	color: "white",
 };
 
 // varijable za cigle
-const brickRowNum = 8;
-const brickColumnNum = 14;
-const brickWidth = 53;
+const brickWidth = 64;
 const brickHeight = 20;
 const brickPadding = 4;
 const brickOffsetTop = 100;
-const brickOffsetLeft = 3;
+
+// izracunava koliko stupaca cigli stane u canvas
+const brickColumnNum = Math.floor(canvas.width / (brickWidth + brickPadding));
+const brickRowNum = 8;
+
+// izracunava koliko prostora zauzimaju cigle u jednom retku (i padding izmedju njih)
+const brickWidthTotal =
+	brickColumnNum * brickWidth + (brickColumnNum - 1) * brickPadding;
+
+// ostatak prostora podijeli na dva i to je offset lijeve i desne strane tako da cigle budu centrirane
+const brickOffsetLeft = (canvas.width - brickWidthTotal) / 2;
+
 let bricks = []; // bricks array
 
 // score i ostalo
 let currentScore = 0;
 let highestScore = localStorage.getItem("highestScore") || 0;
 let gameOver = false;
-let easyMode = false;
+let easyMode = false; // ukoliko je true, prikazuje YOU WIN tekst, postavlja se na true pritiskom "e"
 
 // inicijaliziraj bricks array
 function initBricks() {
@@ -87,7 +97,7 @@ function drawPaddle() {
 }
 
 // fja zaduzena za crtanje loptice (kvadrata)
-// u pocetku radio s okruglom lopticom pa ima radius, plus lakse je za racunat kolizije jer je x i y u centru objekta
+// u pocetku je bilo radjeno s okruglom lopticom pa ima radius, plus lakse je za racunat kolizije jer je x i y u centru objekta
 function drawBall() {
 	ctx.fillStyle = ball.color;
 	ctx.fillRect(
@@ -197,6 +207,7 @@ function updateGame() {
 		return;
 	}
 
+	// pomakni palicu ukoliko je postavljen diferencijal za pomak
 	movePaddle();
 
 	// pomicanje kuglice
@@ -294,23 +305,28 @@ function updateGame() {
 		}
 	}
 
-	// ocisti i crtaj sve za novi frame
+	// ocisti canvas i crtaj sve potrebno za novi frame
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	drawBricks();
 	drawBall();
 	drawPaddle();
 	drawScore();
 
+	// poziva novi frame
 	requestAnimationFrame(updateGame);
 }
 
-// lijeva i desna strelica tipkovnice
+// event listeneri za tipke i klikove
 let leftPressed = false;
 let rightPressed = false;
-
-// event listeneri
 document.addEventListener("keydown", keyDownHandler);
 document.addEventListener("keyup", keyUpHandler);
+canvas.addEventListener("click", function () {
+	// klik na canvas restartira igru ako je igra zavrsila
+	if (gameOver) {
+		resetGame();
+	}
+});
 
 // pocetno inicijaliziranje cigli i inicijalno pozivanje glavnog game loop-a
 initBricks();
@@ -359,10 +375,3 @@ function movePaddle() {
 		paddle.x = canvas.width - paddle.width;
 	}
 }
-
-// klik na canvas restartira igru ako je igra zavrsila
-canvas.addEventListener("click", function () {
-	if (gameOver) {
-		resetGame();
-	}
-});
