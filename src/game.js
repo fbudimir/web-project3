@@ -43,6 +43,7 @@ let bricks = []; // bricks array
 let currentScore = 0;
 let highestScore = localStorage.getItem("highestScore") || 0;
 let gameOver = false;
+let easyMode = false;
 
 // inicijaliziraj bricks array
 function initBricks() {
@@ -64,6 +65,7 @@ function resetGame() {
 	paddle.x = canvas.width / 2 - paddleWidth / 2;
 	currentScore = 0;
 	gameOver = false;
+	easyMode = false;
 	initBricks(); // ponovo inicijaliziraj cigle
 	updateGame(); // pokreni opet loop igre
 }
@@ -186,7 +188,7 @@ function updateGame() {
 
 	// uvjet pobjede
 	// alternativa je provjeravat velicinu bricks array-a
-	if (brickColumnNum * brickRowNum <= currentScore) {
+	if (brickColumnNum * brickRowNum <= currentScore || easyMode) {
 		drawYouWon();
 		gameOver = true;
 		return;
@@ -246,23 +248,31 @@ function updateGame() {
 		for (let r = 0; r < brickRowNum; r++) {
 			let b = bricks[c][r];
 			if (b.status == 1) {
+				// provjera je li loptica (kvadrat) imalo UNUTAR cigle
 				if (
-					// provjera je li loptica (kvadrat) imalo UNUTAR cigle
-					ball.x + ball.radius >= b.x &&
-					ball.x - ball.radius <= b.x + brickWidth &&
-					ball.y + ball.radius >= b.y &&
-					ball.y - ball.radius <= b.y + brickHeight
+					ball.x + ball.radius > b.x &&
+					ball.x - ball.radius < b.x + brickWidth &&
+					ball.y + ball.radius > b.y &&
+					ball.y - ball.radius < b.y + brickHeight
 				) {
 					// provjera s koje strane cigle je udarila loptica
-					// x i y koordinate objekata su gornji lijevi kutevi
-					// usporedjuje se centar kuglice (kvadrata) i zida cigle, npr. ukoliko je centar kuglice iznad gornjeg dijela cigle, A LOPTICA JE UNUTAR CIGLE, znaci da je odbijanje nastalo od gore
-					let collisionFromLeft = ball.x <= b.x;
-					let collisionFromRight = ball.x >= b.x + brickWidth;
-					let collisionFromTop = ball.y <= b.y;
-					let collisionFromBottom = ball.y >= b.y + brickHeight;
+					// x i y koordinate cigle su gornji lijevi kutevi, od loptice je centar
+					// usporedjuje se centar loptice (kvadrata) i zida cigle, npr. ukoliko je centar kuglice U PROSLOM FRAME-U bio iznad gornjeg dijela cigle, A LOPTICA JE TRENUTNO UNUTAR CIGLE, znaci da je odbijanje nastalo od gore
+					let prevBallX = ball.x - ball.dx;
+					let prevBallY = ball.y - ball.dy;
+
+					let collisionFromLeft = prevBallX <= b.x;
+					let collisionFromRight = prevBallX >= b.x + brickWidth;
+					let collisionFromTop = prevBallY <= b.y;
+					let collisionFromBottom = prevBallY >= b.y + brickHeight;
+
+					// stari nacin, nije se gledao prijasnji frame nego trenutni, desavalo bi se da jedan frame ne uhvati centar loptice kao unutar cigle sto ponekad dovodi do prolazenja kroz cigle
+					// 				let collisionFromLeft = ball.x <= b.x;
+					// 				let collisionFromRight = ball.x >= b.x + brickWidth;
+					// 				let collisionFromTop = ball.y <= b.y;
+					// 				let collisionFromBottom = ball.y >= b.y + brickHeight;
 
 					// promjeni smjer kretanja na temelju strane odbijanja
-					// moguce je da se loptica odbije od kuta, u kojem slucaju bi se promijenio i x i y smjer kretanja
 					if (collisionFromBottom) {
 						ball.dy = Math.abs(ball.dy);
 					} else if (collisionFromTop) {
@@ -272,18 +282,6 @@ function updateGame() {
 					} else if (collisionFromRight) {
 						ball.dx = Math.abs(ball.dx);
 					}
-
-					// if (collisionFromBottom) {
-					// 	ball.dy = Math.abs(ball.dy);
-					// } else if (collisionFromTop) {
-					// 	ball.dy = -Math.abs(ball.dy);
-					// }
-					// if (collisionFromLeft) {
-					// 	ball.dx = -Math.abs(ball.dx);
-					// } else if (collisionFromRight) {
-					// 	ball.dx = Math.abs(ball.dx);
-					// }
-					// CUDNO PONASANJE PONEKAD
 
 					// oznaci ciglu kao mrtvu i povecaj score
 					b.status = 0;
@@ -319,10 +317,13 @@ updateGame();
 function keyDownHandler(e) {
 	if (e.key === "ArrowLeft") {
 		leftPressed = true;
+		updatePaddleDirection();
 	} else if (e.key === "ArrowRight") {
 		rightPressed = true;
+		updatePaddleDirection();
+	} else if (e.key === "e") {
+		easyMode = true;
 	}
-	updatePaddleDirection();
 }
 function keyUpHandler(e) {
 	if (e.key === "ArrowLeft") {
