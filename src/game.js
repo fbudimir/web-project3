@@ -73,6 +73,7 @@ function resetGame() {
 // fja zaduzena za crtanje palice
 function drawPaddle() {
 	// gornji svjetliji dio palice
+	// fillRect kreira Rectangle
 	ctx.fillStyle = "#ff6666";
 	ctx.fillRect(paddle.x, paddle.y, paddle.width, 3);
 
@@ -86,17 +87,15 @@ function drawPaddle() {
 }
 
 // fja zaduzena za crtanje loptice (kvadrata)
+// u pocetku radio s okruglom lopticom pa ima radius, plus lakse je za racunat kolizije jer je x i y u centru objekta
 function drawBall() {
-	ctx.beginPath();
 	ctx.fillStyle = ball.color;
 	ctx.fillRect(
-		// u pocetku radio s lopticom pa ima radius, plus lakse je za racunat kolizije
 		ball.x - ball.radius,
 		ball.y - ball.radius,
 		ball.radius * 2,
 		ball.radius * 2
 	);
-	ctx.closePath();
 }
 
 // fja zaduzena za crtanje cigli
