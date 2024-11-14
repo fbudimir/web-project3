@@ -153,7 +153,11 @@ function drawScore() {
 	ctx.textAlign = "right";
 	ctx.textBaseline = "top";
 
-	ctx.fillText("Score: " + currentScore, canvas.width - 20, 20);
+	ctx.fillText(
+		"Score: " + currentScore + " / " + brickColumnNum * brickRowNum,
+		canvas.width - 20,
+		20
+	);
 	ctx.fillText("High Score: " + highestScore, canvas.width - 20, 50);
 }
 
@@ -313,7 +317,7 @@ document.addEventListener("keyup", keyUpHandler);
 initBricks();
 updateGame();
 
-// fja koje provjeravaju koji gumb je spusten/dignut
+// fje koje provjeravaju koji gumb je spusten/dignut
 function keyDownHandler(e) {
 	if (e.key === "ArrowLeft") {
 		leftPressed = true;
